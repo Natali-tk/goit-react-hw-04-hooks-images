@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import s from './ImageGallery.module.css';
 
-const ImageGallery = ({images,onSelect}) => {
+function ImageGallery ({images,onSelect}) {
   return (
     <ul className={s.imageGalleryList} >
         {images.map(image=>(

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import s from './ImageGalleryItem.module.css';
 
-const ImageGalleryItem = ({ webformatURL,largeImageURL,alt="",getLargeImageURL}) => {
+function ImageGalleryItem ({ webformatURL,largeImageURL,alt="",getLargeImageURL}) {
   
   return (
     <li className={s.galleryItem} >
