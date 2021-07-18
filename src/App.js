@@ -59,9 +59,6 @@ function App() {
   };
 
   
-   if(query && images.length === 0){
-     return toast.error('No match!');
-   }
    
   return (
     <>
