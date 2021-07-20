@@ -2,9 +2,9 @@ import React from "react";
 import s from './Button.module.css';
 import PropTypes from 'prop-types';
 
-const Button = ({ fetchImages}) => {
+const Button = ({onClick}) => {
   return (
-    <button className={s.button} type="button" onClick={fetchImages}>
+    <button className={s.button} type="button" onClick={onClick}>
      Load more
     </button>
   );
@@ -14,5 +14,5 @@ export default Button;
 
 
 Button.propTypes = {
-    fetchImages: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired
 }

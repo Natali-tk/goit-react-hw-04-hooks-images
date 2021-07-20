@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import Api from './services/image-api';
+import { fetchImages } from './services/image-api.js';
 import Modal from './components/Modal/Modal';
 import Searchbar from './components/Searchbar/Searchbar';
 import ImageGallery from './components/ImageGallery/ImageGallery';
@@ -11,19 +11,38 @@ import Loader from './components/Loader/Loader';
 
 function App() {
   const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState('');
+  const [reqStatus, setReqStatus] = useState('idle');
+ 
+ 
+  useEffect(() => {
+    if (reqStatus === 'rejected' && images.length === 0) {
+      toast.error('Oops, no match');
+      
+    }
+  }, [reqStatus, images.length]);
 
   useEffect(() => {
-    if (!query) {
-      return;
+    if (!query) return;
+
+    async function onFetchImages() {
+      try {
+        setReqStatus('pending');
+        setImages([]);
+        const images = await fetchImages({ query, page });
+        setReqStatus('resolve');
+        setImages(prevState => [...prevState, ...images]);
+      } catch (error) {
+        setReqStatus('rejected');
+      }
     }
-    fetchImages();
-  }, [query]);
+    onFetchImages();
+    
+  }, [query, page]);
 
   useEffect(() => {
     window.scrollTo({
@@ -36,19 +55,10 @@ function App() {
     setShowModal(!showModal);
   };
 
-  const fetchImages = () => {
-    setLoading(true);
-    Api.fetchImages({ query, page })
-      .then(
-        images => setImages(prevState => [...prevState, ...images]),
-        setPage(prevState => prevState + 1),
-      )
-      .catch(error => setError(error))
-      .finally(() => setLoading(false));
-  };
   const handleSelectImage = imageUrl => {
     setSelectedImage(imageUrl);
-    toggleModal();
+    toggleModal()
+    
   };
 
   const handleSubmit = query => {
@@ -56,17 +66,16 @@ function App() {
     setImages([]);
     setPage(1);
     setError(null);
+    
   };
 
-  
-   
   return (
     <>
       {error && toast.error('OOO, something is wrong!')}
       <Searchbar onSubmit={handleSubmit} />
-      {loading && <Loader />}
+      {reqStatus==='pending' && <Loader />}
       <ImageGallery images={images} onSelect={handleSelectImage} />
-      {images.length > 0 && <Button fetchImages={fetchImages} />}
+      {images.length > 0 && <Button onClick={() => setPage(page + 1)} />}
       {showModal && (
         <Modal onClose={toggleModal} largeImageURL={selectedImage} />
       )}
@@ -75,4 +84,3 @@ function App() {
   );
 }
 export default App;
-
