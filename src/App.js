@@ -9,6 +9,7 @@ import ImageGallery from './components/ImageGallery/ImageGallery';
 import Button from './components/Button/Button';
 import Loader from './components/Loader/Loader';
 
+
 function App() {
   const [images, setImages] = useState([]);
   const [error, setError] = useState(null);
@@ -20,21 +21,22 @@ function App() {
  
  
   useEffect(() => {
-    if (reqStatus === 'rejected' && images.length === 0) {
-      toast.error('Oops, no match');
-      
+    if (reqStatus === 'rejected') {
+      toast.error('Oops, no match');  
     }
   }, [reqStatus, images.length]);
-
+  
   useEffect(() => {
     if (!query) return;
 
     async function onFetchImages() {
       try {
         setReqStatus('pending');
-        setImages([]);
         const images = await fetchImages({ query, page });
         setReqStatus('resolve');
+        if ( images.length === 0) {
+      toast.error('Oops, no match');
+     }
         setImages(prevState => [...prevState, ...images]);
       } catch (error) {
         setReqStatus('rejected');
@@ -74,7 +76,7 @@ function App() {
       {error && toast.error('OOO, something is wrong!')}
       <Searchbar onSubmit={handleSubmit} />
       {reqStatus==='pending' && <Loader />}
-      <ImageGallery images={images} onSelect={handleSelectImage} />
+      {images.length > 0 && <ImageGallery images={images} onSelect={handleSelectImage} />}
       {images.length > 0 && <Button onClick={() => setPage(page + 1)} />}
       {showModal && (
         <Modal onClose={toggleModal} largeImageURL={selectedImage} />
